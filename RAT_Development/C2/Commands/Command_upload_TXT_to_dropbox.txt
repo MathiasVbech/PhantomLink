@@ -1,0 +1,25 @@
+# Get access token for Dropbox API
+$accessToken = "YOUR API KEY GOES HERE"
+
+# Get the directory where this script is located
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+# Create path to test.txt in the same directory as the script
+$sourcePath = Join-Path $scriptDir "test.txt"
+
+# Define Dropbox destination path
+$dropboxPath = "/test.txt"  # Note: Must start with forward slash
+
+# Set up headers for Dropbox API request
+$headers = @{
+    "Authorization" = "Bearer $accessToken"
+    "Content-Type" = "application/octet-stream"
+    "Dropbox-API-Arg" = "{`"path`":`"$dropboxPath`",`"mode`":`"overwrite`"}"
+}
+
+# Read file content as bytes
+$fileContent = [System.IO.File]::ReadAllBytes($sourcePath)
+
+# Upload to Dropbox
+Write-Host "Uploading to $dropboxPath..."
+Invoke-RestMethod -Uri "https://content.dropboxapi.com/2/files/upload" -Headers $headers -Method Post -Body $fileContent
